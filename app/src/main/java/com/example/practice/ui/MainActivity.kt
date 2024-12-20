@@ -1,26 +1,27 @@
-package com.example.practice
+package com.example.practice.ui
 
 import android.os.Bundle
-import android.service.voice.VoiceInteractionSession.ActivityId
-import android.view.LayoutInflater
-import android.widget.LinearLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.OnReceiveContentViewBehavior
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.practice.R
 import com.example.practice.databinding.ActivityMainBinding
+import com.example.practice.ui.adapters.QuoteAdapter
 import com.example.practice.view_modules.MainViewModel
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.Objects
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     lateinit var binding :ActivityMainBinding
     private val mainViewModel: MainViewModel by viewModels()
+    private val quoteAdapter = QuoteAdapter()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -32,9 +33,22 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        binding.recyclerView1.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView1.adapter = quoteAdapter
+
         lifecycleScope.launch {
             mainViewModel.getListOfQuote()
         }
+
+        mainViewModel.listOfQuote.observe(this){
+            if (!Objects.isNull(it)){
+                println("=====it: ${it[0]}")
+                quoteAdapter.fetchQuoteList(it)
+            }
+        }
+
+
+
 
     }
 }
